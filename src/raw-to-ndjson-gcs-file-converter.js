@@ -31,7 +31,7 @@ class RawToNDJsonGCSFileConverter {
   }
 
   /*
-   * Load raw content from the original log file.
+   * Load raw content from the original file.
    */
   async _loadSourceContent(bucket, filename) {
     const downloadedChunks = await this._storage
@@ -39,13 +39,12 @@ class RawToNDJsonGCSFileConverter {
       .file(filename)
       .download();
 
-    const sourceContent = ''.concat(downloadedChunks);
-
-    return sourceContent;
+    return ''.concat(downloadedChunks);
   }
 
   /*
-   * Split the given string into an array of substrings and remove empty elements.
+   * Split the given string into an array of substrings,
+   * then remove empty elements.
    */
   _splitStringIntoArray(str, splitter) {
     const array = str.split(splitter);
@@ -53,7 +52,8 @@ class RawToNDJsonGCSFileConverter {
   }
 
   /*
-   * Parse raw content into JSON objects and push them to a stream.
+   * Parse raw content into JSON objects,
+   * then and push them as newline delimited JSON to a stream.
    */
   _parseRawIntoNDJson(logLines) {
     const dataStream = ndjson.serialize();
@@ -68,7 +68,7 @@ class RawToNDJsonGCSFileConverter {
   }
 
   /*
-   * Write data to the target file using the given stream.
+   * Write data to the target file after consuming the given stream.
    */
   async _writeTargetFile(bucket, filename, dataStream) {
     const targetFile = this._storage
