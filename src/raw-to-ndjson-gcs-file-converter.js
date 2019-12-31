@@ -17,7 +17,7 @@ class RawToNDJsonGCSFileConverter {
     const sourceContent = await this._loadSourceContent(sourceBucket, sourceFilename);
     console.log(' .   source content downloaded');
 
-    const logLines = this._splitStringsIntoArray(sourceContent, /\r\n|\n\r|\r|\n/);
+    const logLines = this._splitStringIntoArray(sourceContent, /\r\n|\n\r|\r|\n/);
 
     console.log(` ..  converting ${logLines.length} lines`);
     const dataStream = this._parseRawIntoNDJson(logLines);
@@ -45,11 +45,11 @@ class RawToNDJsonGCSFileConverter {
   }
 
   /*
-   * Split string into an array of strings and remove empty values.
+   * Split the given string into an array of substrings and remove empty elements.
    */
-  _splitStringsIntoArray(strings, splitter) {
-    const array = strings.split(splitter);
-    return array.filter(str => /\S/.test(str));
+  _splitStringIntoArray(str, splitter) {
+    const array = str.split(splitter);
+    return array.filter(element => /\S/.test(element));
   }
 
   /*
