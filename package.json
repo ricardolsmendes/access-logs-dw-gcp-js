@@ -1,0 +1,36 @@
+{
+  "name": "access-logs-dw-gcp-js",
+  "version": "0.0.1",
+  "description": "Utility functions used to backup access logs into a Google Cloud-hosted Data Warehouse",
+  "license": "MIT",
+  "homepage": "https://github.com/ricardolsmendes/access-logs-dw-gcp-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricardolsmendes/access-logs-dw-gcp-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ricardolsmendes/access-logs-dw-gcp-js/issues"
+  },
+  "author": "Ricardo Mendes <ricardolsmendes@gmail.com>",
+  "main": "./src/index.js",
+  "scripts": {
+    "fix": "eslint --fix **/*.js",
+    "lint": "eslint **/*.js",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^4.1.3",
+    "access-logs-parser": "github:ricardolsmendes/access-logs-js-parser",
+    "ndjson": "^1.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^6.2.2",
+    "sinon": "^7.5.0"
+  }
+}
