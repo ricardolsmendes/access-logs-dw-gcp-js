@@ -7,39 +7,35 @@ const ndjson = require('ndjson');
 
 class RawToNDJsonGCSFileConverter {
 
-  constructor() {
-    this._storage = new Storage();
-  }
+  async convert(file, targetBucket) {
+    console.log(`>> Starting to convert file gs://${file.bucket.name}/${file.name}`);
 
-  async convert(sourceBucket, sourceFilename, targetBucket) {
-    console.log(`Starting to convert gs://${sourceBucket}/${sourceFilename}`);
+    console.log(' .   downloading raw contents');
+    const sourceContent = await this._loadContents(file);
 
-    const sourceContent = await this._loadSourceContent(sourceBucket, sourceFilename);
-    console.log(' .   source content downloaded');
+    const logLines = this._splitStringIntoArray(sourceContent, /\r\n|\r|\n/);
 
-    const logLines = this._splitStringIntoArray(sourceContent, /\r\n|\n\r|\r|\n/);
+    console.log(` ..  transforming ${logLines.length} lines`);
+    const ndjsonStream = this._parseRawIntoNDJson(logLines);
 
-    console.log(` ..  converting ${logLines.length} lines`);
-    const dataStream = this._parseRawIntoNDJson(logLines);
+    const targetFile = new Storage()
+      .bucket(targetBucket)
+      .file(`${file.name.substring(0, file.name.lastIndexOf('.'))}.jsonl`);
 
-    const filenamePrefix = `${sourceFilename.substring(0, sourceFilename.lastIndexOf('.'))}`;
-    const targetFilename = `${filenamePrefix}.jsonl`;
-    console.log(` ... writing converted content into gs://${targetBucket}/${targetFilename}`);
-    await this._writeTargetFile(targetBucket, targetFilename, dataStream);
+    console.log(` ... writing JSON Lines to gs://${targetBucket}/${targetFile.name}`);
+    await this._writeContent(ndjsonStream, targetFile);
 
-    console.log('DONE!');
+    console.log('>> DONE!');
+
+    return targetFile;
   }
 
   /*
-   * Load raw content from the original file.
+   * Load the given file contents into memory.
    */
-  async _loadSourceContent(bucket, filename) {
-    const downloadedChunks = await this._storage
-      .bucket(bucket)
-      .file(filename)
-      .download();
-
-    return ''.concat(downloadedChunks);
+  async _loadContents(file) {
+    const contents = await file.download();
+    return contents[0].toString();
   }
 
   /*
@@ -53,7 +49,7 @@ class RawToNDJsonGCSFileConverter {
 
   /*
    * Parse raw content into JSON objects,
-   * then and push them as newline delimited JSON to a stream.
+   * then push them as newline delimited JSON to a stream.
    */
   _parseRawIntoNDJson(logLines) {
     const dataStream = ndjson.serialize();
@@ -64,22 +60,24 @@ class RawToNDJsonGCSFileConverter {
       dataStream.write(parsedLog);
     });
 
+    dataStream.end();
+
     return dataStream;
   }
 
   /*
-   * Write data to the target file after consuming the given stream.
+   * Consume the given stream and write the content to a file.
    */
-  async _writeTargetFile(bucket, filename, dataStream) {
-    const targetFile = this._storage
-      .bucket(bucket)
-      .file(filename);
-
-    await dataStream.pipe(targetFile.createWriteStream({
+  _writeContent(inputStream, file) {
+    const fileWriteStream = file.createWriteStream({
       resumable: false
-    }));
+    });
 
-    dataStream.end();
+    return new Promise((resolve, reject) => {
+      inputStream.pipe(fileWriteStream)
+        .on('finish', resolve)
+        .on('error', reject);
+    });
   }
 
 }
