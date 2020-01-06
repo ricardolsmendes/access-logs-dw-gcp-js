@@ -55,7 +55,7 @@ class RawToNDJsonGCSFileConverter {
     const dataStream = ndjson.serialize();
     const logParser = new LogParser();
 
-    logLines.forEach(function(logLine) {
+    logLines.forEach(logLine => {
       const parsedLog = logParser.parseTomcatCommonFormat(logLine);
       dataStream.write(parsedLog);
     });
