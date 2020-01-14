@@ -33,8 +33,7 @@ describe('LogParser', () => {
       const file = new Storage().bucket('sourceBucket').file('test.txt');
       const response = converter.convert(file, 'targetBucket');
 
-      assert.strictEqual('[object Promise]', Object.prototype.toString.call(
-        response));
+      assert.strictEqual(Object.prototype.toString.call(response), '[object Promise]');
 
       downloadStub.restore();
     });
@@ -66,27 +65,41 @@ describe('LogParser', () => {
       parseStub.restore();
     });
 
-    it('converts json objets to newline delimited json', async () => {
+    it('allows generating JSON with keys in special case', async () => {
       const downloadStub = sinon.stub(File.prototype, 'download').resolves([
-        'line 1\nline 2\nline3'
+        'line 1'
+      ]);
+
+      const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
+
+      const file = new Storage().bucket('sourceBucket').file('test.txt');
+      await converter.convert(file, 'targetBucket', 'snake');
+
+      sinon.assert.calledWith(parseStub, 'line 1', 'snake');
+
+      downloadStub.restore();
+      parseStub.restore();
+    });
+
+    it('converts JSON objects to newline delimited JSON', async () => {
+      const downloadStub = sinon.stub(File.prototype, 'download').resolves([
+        'line 1\nline 2\nline 3'
       ]);
 
       const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
 
       const fakeStream = ndjson.serialize();
-      const streamMock = sinon.mock(fakeStream);
-      streamMock.expects('write').thrice();
-
-      const ndjsonStreamStub = sinon.stub(ndjson, 'serialize').returns(fakeStream);
+      const writeStub = sinon.stub(fakeStream, 'write');
+      const ndjsonSerializeStub = sinon.stub(ndjson, 'serialize').returns(fakeStream);
 
       const file = new Storage().bucket('sourceBucket').file('test.txt');
       await converter.convert(file, 'targetBucket');
 
-      streamMock.verify();
+      sinon.assert.calledThrice(writeStub);
 
       downloadStub.restore();
       parseStub.restore();
-      ndjsonStreamStub.restore();
+      ndjsonSerializeStub.restore();
     });
 
     afterEach(() => {

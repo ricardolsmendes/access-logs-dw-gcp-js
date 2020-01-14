@@ -7,7 +7,7 @@ const ndjson = require('ndjson');
 
 class RawToNDJsonGCSFileConverter {
 
-  async convert(file, targetBucket) {
+  async convert(file, targetBucket, jsonKeysCase = 'default') {
     console.log(`>> Starting to convert file gs://${file.bucket.name}/${file.name}`);
 
     console.log(' .   downloading raw contents');
@@ -16,7 +16,7 @@ class RawToNDJsonGCSFileConverter {
     const logLines = this._splitStringIntoArray(sourceContent, /\r\n|\r|\n/);
 
     console.log(` ..  transforming ${logLines.length} lines`);
-    const ndjsonStream = this._parseRawIntoNDJson(logLines);
+    const ndjsonStream = this._parseRawIntoNDJson(logLines, jsonKeysCase);
 
     const targetFile = new Storage()
       .bucket(targetBucket)
@@ -51,12 +51,12 @@ class RawToNDJsonGCSFileConverter {
    * Parse raw content into JSON objects,
    * then push them as newline delimited JSON to a stream.
    */
-  _parseRawIntoNDJson(logLines) {
+  _parseRawIntoNDJson(logLines, jsonKeysCase) {
     const dataStream = ndjson.serialize();
     const logParser = new LogParser();
 
     logLines.forEach(logLine => {
-      const parsedLog = logParser.parseTomcatCommonFormat(logLine);
+      const parsedLog = logParser.parseTomcatCommonFormat(logLine, jsonKeysCase);
       dataStream.write(parsedLog);
     });
 
