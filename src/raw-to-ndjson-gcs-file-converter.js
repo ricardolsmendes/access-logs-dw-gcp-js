@@ -1,7 +1,7 @@
 'use strict';
 
-const { LogParser } = require('access-logs-parser');
 const { Storage } = require('@google-cloud/storage');
+const { LogParser } = require('access-logs-parser');
 
 const ndjson = require('ndjson');
 

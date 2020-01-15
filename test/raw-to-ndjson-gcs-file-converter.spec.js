@@ -1,14 +1,14 @@
 'use strict';
 
+const { PassThrough } = require('stream');
+
 const assert = require('assert');
 const sinon = require('sinon');
 
-const ndjson = require('ndjson');
-
-const { PassThrough } = require('stream');
-
 const { File, Storage } = require('@google-cloud/storage');
 const { LogParser } = require('access-logs-parser');
+
+const ndjson = require('ndjson');
 
 const { RawToNDJsonGCSFileConverter } = require('../src');
 
