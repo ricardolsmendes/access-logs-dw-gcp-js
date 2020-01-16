@@ -1,6 +1,6 @@
 {
   "name": "access-logs-dw-gcp-js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Utility functions used to backup access logs into a Google Cloud-hosted Data Warehouse",
   "license": "MIT",
   "homepage": "https://github.com/ricardolsmendes/access-logs-dw-gcp-js#readme",

@@ -5,9 +5,9 @@ const { LogParser } = require('access-logs-parser');
 
 const ndjson = require('ndjson');
 
-class RawToNDJsonGCSFileConverter {
+class RawToSchemaGCSFileConverter {
 
-  async convert(file, targetBucket, jsonKeysCase = 'default') {
+  async jsonLines(file, targetBucketName, jsonKeysCase = 'default') {
     console.log(`>> Starting to convert file gs://${file.bucket.name}/${file.name}`);
 
     console.log(' .   downloading raw contents');
@@ -19,10 +19,10 @@ class RawToNDJsonGCSFileConverter {
     const ndjsonStream = this._parseRawIntoNDJson(logLines, jsonKeysCase);
 
     const targetFile = new Storage()
-      .bucket(targetBucket)
+      .bucket(targetBucketName)
       .file(`${file.name.substring(0, file.name.lastIndexOf('.'))}.jsonl`);
 
-    console.log(` ... writing JSON Lines to gs://${targetBucket}/${targetFile.name}`);
+    console.log(` ... writing JSON Lines to gs://${targetBucketName}/${targetFile.name}`);
     await this._writeContent(ndjsonStream, targetFile);
 
     console.log('>> DONE!');
@@ -48,8 +48,8 @@ class RawToNDJsonGCSFileConverter {
   }
 
   /*
-   * Parse raw content into JSON objects,
-   * then push them as newline delimited JSON to a stream.
+   * Parse raw content into newline delimited JSON
+   * and return the result as a stream.
    */
   _parseRawIntoNDJson(logLines, jsonKeysCase) {
     const dataStream = ndjson.serialize();
@@ -82,4 +82,4 @@ class RawToNDJsonGCSFileConverter {
 
 }
 
-module.exports = { RawToNDJsonGCSFileConverter: RawToNDJsonGCSFileConverter };
+module.exports = { RawToSchemaGCSFileConverter: RawToSchemaGCSFileConverter };

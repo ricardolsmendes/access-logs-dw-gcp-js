@@ -1,5 +1,5 @@
 'use strict';
 
-const { RawToNDJsonGCSFileConverter } = require('./raw-to-ndjson-gcs-file-converter');
+const { RawToSchemaGCSFileConverter } = require('./raw-to-schema-gcs-file-converter');
 
-module.exports = { RawToNDJsonGCSFileConverter: RawToNDJsonGCSFileConverter };
+module.exports = { RawToSchemaGCSFileConverter: RawToSchemaGCSFileConverter };
