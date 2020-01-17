@@ -1,6 +1,6 @@
 {
   "name": "access-logs-dw-gcp-js",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Utility functions used to backup access logs into a Google Cloud-hosted Data Warehouse",
   "license": "MIT",
   "homepage": "https://github.com/ricardolsmendes/access-logs-dw-gcp-js#readme",
@@ -20,6 +20,7 @@
     "test": "mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha-multi-reporters.json"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^4.6.1",
     "@google-cloud/storage": "^4.2.0",
     "access-logs-parser": "github:ricardolsmendes/access-logs-js-parser",
     "ndjson": "^1.5.0"
