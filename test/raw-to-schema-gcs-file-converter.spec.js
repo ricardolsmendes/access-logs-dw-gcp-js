@@ -18,8 +18,11 @@ describe('RawToSchemaGCSFileConverter', () => {
   var createWriteStreamStub;
   var converter;
 
-  beforeEach(() => {
+  before(() => {
     consoleLogStub = sinon.stub(console, 'log');
+  });
+
+  beforeEach(() => {
     createWriteStreamStub = sinon.stub(File.prototype, 'createWriteStream')
       .returns(new PassThrough());
     converter = new RawToSchemaGCSFileConverter();
@@ -103,8 +106,11 @@ describe('RawToSchemaGCSFileConverter', () => {
     });
 
     afterEach(() => {
-      consoleLogStub.restore();
       createWriteStreamStub.restore();
+    });
+
+    after(() => {
+      consoleLogStub.restore();
     });
 
   });
