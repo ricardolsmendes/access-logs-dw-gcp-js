@@ -41,7 +41,7 @@ describe('GCSToBigQueryLoader', () => {
 
       loader.jsonLines('bucket', 'file', 'dataset', 'table');
 
-      assert.deepStrictEqual(loadStub.getCalls()[0].args[1], {
+      assert.deepStrictEqual(loadStub.getCall(0).args[1], {
         sourceFormat: 'NEWLINE_DELIMITED_JSON'
       });
 
