@@ -24,20 +24,23 @@ class GCSToBigQueryLoader {
       sourceFormat: 'NEWLINE_DELIMITED_JSON'
     };
 
-    // Load data from a Google Cloud Storage file into the Table
-    console.log(` . writing content into ${targetDatasetId}.${targetTableId}`);
-    const [job] = await new BigQuery()
+    // Load data from a Google Cloud Storage file into the table
+    const table = new BigQuery()
       .dataset(targetDatasetId)
-      .table(targetTableId)
-      .load(sourceFile, metadata);
+      .table(targetTableId);
 
-    console.log(`>> Job ${job.id} completed.`);
+    console.log(` . writing content into ${targetDatasetId}.${targetTableId}`);
+    const [job] = await table.load(sourceFile, metadata);
+
+    console.log(`>> JOB ${job.id} COMPLETED!`);
 
     // Check the job's status for errors
     const errors = job.status.errors;
     if (errors && errors.length > 0) {
       throw errors;
     }
+
+    return table;
   }
 
 }
