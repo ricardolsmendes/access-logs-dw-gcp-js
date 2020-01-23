@@ -27,7 +27,8 @@ describe('GCSToBigQueryLoader', () => {
         { id: 'Test Job', status: { errors: null } }
       ]);
 
-      const response = loader.jsonLines('bucket', 'file', 'dataset', 'table');
+      const response = loader.jsonLines(
+        'sourceBucket', 'test.txt', 'targetDataset', 'targetTable');
 
       assert.strictEqual(Object.prototype.toString.call(response), '[object Promise]');
 
@@ -39,7 +40,7 @@ describe('GCSToBigQueryLoader', () => {
         { id: 'Test Job', status: { errors: null } }
       ]);
 
-      loader.jsonLines('bucket', 'file', 'dataset', 'table');
+      loader.jsonLines('sourceBucket', 'test.txt', 'targetDataset', 'targetTable');
 
       assert.deepStrictEqual(loadStub.getCall(0).args[1], {
         sourceFormat: 'NEWLINE_DELIMITED_JSON'
@@ -53,8 +54,8 @@ describe('GCSToBigQueryLoader', () => {
         { id: 'Test Job', status: { errors: [{ message: 'Testing an error!' }] } }
       ]);
 
-      assert.rejects(() => loader.jsonLines('bucket', 'file', 'dataset',
-        'table'), [{ message: 'Testing an error!' }]);
+      assert.rejects(() => loader.jsonLines('sourceBucket', 'test.txt', 'targetDataset',
+        'targetTable'), [{ message: 'Testing an error!' }]);
 
       loadStub.restore();
     });

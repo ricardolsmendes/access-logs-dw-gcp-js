@@ -1,17 +1,22 @@
 'use strict';
 
+const ndjson = require('ndjson');
+
 const { Storage } = require('@google-cloud/storage');
 const { LogParser } = require('access-logs-parser');
 
-const ndjson = require('ndjson');
-
 class RawToSchemaGCSFileConverter {
 
-  async jsonLines(file, targetBucketName, jsonKeysCase = 'default') {
-    console.log(`>> Starting to convert file gs://${file.bucket.name}/${file.name}`);
+  async jsonLines(
+    sourceBucketName, sourceFileName, targetBucketName, jsonKeysCase = 'default') {
+
+    console.log(`>> Starting to convert file gs://${sourceBucketName}/${sourceFileName}`);
+    const sourceFile = new Storage()
+      .bucket(sourceBucketName)
+      .file(sourceFileName);
 
     console.log(' .   downloading raw contents');
-    const sourceContent = await this._loadContents(file);
+    const sourceContent = await this._loadContents(sourceFile);
 
     const logLines = this._splitStringIntoArray(sourceContent, /\r\n|\r|\n/);
 
@@ -20,7 +25,7 @@ class RawToSchemaGCSFileConverter {
 
     const targetFile = new Storage()
       .bucket(targetBucketName)
-      .file(`${file.name.substring(0, file.name.lastIndexOf('.'))}.jsonl`);
+      .file(`${sourceFileName.substring(0, sourceFileName.lastIndexOf('.'))}.jsonl`);
 
     console.log(` ... writing JSON Lines to gs://${targetBucketName}/${targetFile.name}`);
     await this._writeContent(ndjsonStream, targetFile);

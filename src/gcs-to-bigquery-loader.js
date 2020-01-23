@@ -11,7 +11,12 @@ class GCSToBigQueryLoader {
   /**
    * Appends data to an existing table.
    */
-  async jsonLines(bucketName, filename, datasetId, tableId) {
+  async jsonLines(sourceBucketName, sourceFileName, targetDatasetId, targetTableId) {
+
+    console.log(`>> Starting to load file gs://${sourceBucketName}/${sourceFileName}`);
+    const sourceFile = new Storage()
+      .bucket(sourceBucketName)
+      .file(sourceFileName);
 
     // Configure the load job. For full list of options, see:
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad.
@@ -20,16 +25,13 @@ class GCSToBigQueryLoader {
     };
 
     // Load data from a Google Cloud Storage file into the Table
-    const sourceFile = new Storage()
-      .bucket(bucketName)
-      .file(filename);
-
+    console.log(` . writing content into ${targetDatasetId}.${targetTableId}`);
     const [job] = await new BigQuery()
-      .dataset(datasetId)
-      .table(tableId)
+      .dataset(targetDatasetId)
+      .table(targetTableId)
       .load(sourceFile, metadata);
 
-    console.log(`Job ${job.id} completed.`);
+    console.log(`>> Job ${job.id} completed.`);
 
     // Check the job's status for errors
     const errors = job.status.errors;

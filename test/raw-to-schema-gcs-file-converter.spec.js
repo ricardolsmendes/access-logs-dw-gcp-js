@@ -1,14 +1,12 @@
 'use strict';
 
-const { PassThrough } = require('stream');
-
 const assert = require('assert');
 const sinon = require('sinon');
-
-const { File, Storage } = require('@google-cloud/storage');
-const { LogParser } = require('access-logs-parser');
+const { PassThrough } = require('stream');
 
 const ndjson = require('ndjson');
+const { File } = require('@google-cloud/storage');
+const { LogParser } = require('access-logs-parser');
 
 const { RawToSchemaGCSFileConverter } = require('../src');
 
@@ -33,8 +31,7 @@ describe('RawToSchemaGCSFileConverter', () => {
     it('returns a promise', () => {
       const downloadStub = sinon.stub(File.prototype, 'download').resolves(['']);
 
-      const file = new Storage().bucket('sourceBucket').file('test.txt');
-      const response = converter.jsonLines(file, 'targetBucket');
+      const response = converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
 
       assert.strictEqual(Object.prototype.toString.call(response), '[object Promise]');
 
@@ -44,8 +41,7 @@ describe('RawToSchemaGCSFileConverter', () => {
     it('downloads the source file', () => {
       const downloadStub = sinon.stub(File.prototype, 'download').resolves(['']);
 
-      const file = new Storage().bucket('sourceBucket').file('test.txt');
-      converter.jsonLines(file, 'targetBucket');
+      converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
 
       sinon.assert.calledOnce(downloadStub);
 
@@ -59,8 +55,7 @@ describe('RawToSchemaGCSFileConverter', () => {
 
       const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
 
-      const file = new Storage().bucket('sourceBucket').file('test.txt');
-      await converter.jsonLines(file, 'targetBucket');
+      await converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
 
       sinon.assert.calledTwice(parseStub);
 
@@ -75,8 +70,7 @@ describe('RawToSchemaGCSFileConverter', () => {
 
       const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
 
-      const file = new Storage().bucket('sourceBucket').file('test.txt');
-      await converter.jsonLines(file, 'targetBucket', 'snake');
+      await converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket', 'snake');
 
       sinon.assert.calledWith(parseStub, 'line 1', 'snake');
 
@@ -95,8 +89,7 @@ describe('RawToSchemaGCSFileConverter', () => {
       const writeStub = sinon.stub(fakeStream, 'write');
       const ndjsonSerializeStub = sinon.stub(ndjson, 'serialize').returns(fakeStream);
 
-      const file = new Storage().bucket('sourceBucket').file('test.txt');
-      await converter.jsonLines(file, 'targetBucket');
+      await converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
 
       sinon.assert.calledThrice(writeStub);
 
