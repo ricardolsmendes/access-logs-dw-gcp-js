@@ -27,10 +27,11 @@ describe('GCSToBigQueryLoader', () => {
         { id: 'Test Job', status: { errors: null } }
       ]);
 
-      const response = loader.jsonLines(
+      const jsonLinesReturn = loader.jsonLines(
         'sourceBucket', 'test.txt', 'targetDataset', 'targetTable');
 
-      assert.strictEqual(Object.prototype.toString.call(response), '[object Promise]');
+      assert.strictEqual(Object.prototype.toString.call(jsonLinesReturn),
+        '[object Promise]');
 
       loadStub.restore();
     });

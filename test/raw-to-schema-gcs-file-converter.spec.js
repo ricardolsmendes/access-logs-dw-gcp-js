@@ -31,9 +31,11 @@ describe('RawToSchemaGCSFileConverter', () => {
     it('returns a promise', () => {
       const downloadStub = sinon.stub(File.prototype, 'download').resolves(['']);
 
-      const response = converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
+      const jsonLinesReturn = converter.jsonLines('sourceBucket', 'test.txt',
+        'targetBucket');
 
-      assert.strictEqual(Object.prototype.toString.call(response), '[object Promise]');
+      assert.strictEqual(Object.prototype.toString.call(jsonLinesReturn),
+        '[object Promise]');
 
       downloadStub.restore();
     });
