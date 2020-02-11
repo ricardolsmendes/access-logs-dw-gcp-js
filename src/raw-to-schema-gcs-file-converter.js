@@ -62,7 +62,7 @@ class RawToSchemaGCSFileConverter {
 
     logLines.forEach(logLine => {
       const parsedLog = logParser.parseTomcatCommonFormat(logLine, jsonKeysCase);
-      dataStream.write(parsedLog);
+      if (parsedLog) { dataStream.write(parsedLog); }
     });
 
     dataStream.end();

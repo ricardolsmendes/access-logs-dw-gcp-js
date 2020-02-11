@@ -85,7 +85,8 @@ describe('RawToSchemaGCSFileConverter', () => {
         'line 1\nline 2\nline 3'
       ]);
 
-      const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
+      const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat')
+        .callsFake(line => `parsed ${line}`);
 
       const fakeStream = ndjson.serialize();
       const writeStub = sinon.stub(fakeStream, 'write');
@@ -94,6 +95,26 @@ describe('RawToSchemaGCSFileConverter', () => {
       await converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
 
       sinon.assert.calledThrice(writeStub);
+
+      downloadStub.restore();
+      parseStub.restore();
+      ndjsonSerializeStub.restore();
+    });
+
+    it('does not write null JSON objects', async () => {
+      const downloadStub = sinon.stub(File.prototype, 'download').resolves([
+        'line 1\nline 2\nline 3'
+      ]);
+
+      const parseStub = sinon.stub(LogParser.prototype, 'parseTomcatCommonFormat');
+
+      const fakeStream = ndjson.serialize();
+      const writeStub = sinon.stub(fakeStream, 'write');
+      const ndjsonSerializeStub = sinon.stub(ndjson, 'serialize').returns(fakeStream);
+
+      await converter.jsonLines('sourceBucket', 'test.txt', 'targetBucket');
+
+      sinon.assert.notCalled(writeStub);
 
       downloadStub.restore();
       parseStub.restore();
