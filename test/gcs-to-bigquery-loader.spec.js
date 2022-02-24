@@ -9,8 +9,8 @@ const { GCSToBigQueryLoader } = require('../src');
 
 describe('GCSToBigQueryLoader', () => {
 
-  var consoleLogStub;
-  var loader;
+  let consoleLogStub;
+  let loader;
 
   before(() => {
     consoleLogStub = sinon.stub(console, 'log');
