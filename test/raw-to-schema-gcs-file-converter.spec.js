@@ -12,9 +12,9 @@ const { RawToSchemaGCSFileConverter } = require('../src');
 
 describe('RawToSchemaGCSFileConverter', () => {
 
-  var consoleLogStub;
-  var createWriteStreamStub;
-  var converter;
+  let consoleLogStub;
+  let createWriteStreamStub;
+  let converter;
 
   before(() => {
     consoleLogStub = sinon.stub(console, 'log');
